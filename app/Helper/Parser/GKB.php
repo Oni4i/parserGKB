@@ -33,7 +33,7 @@ class GKB
         $result = [];
         foreach ($html->querySelectorAll('article') as $article) {
             $articleValues['title'] = $article->querySelector('h3')->nodeValue;
-            $articleValues['date'] = $article->querySelector('.dt')->nodeValue;
+            $articleValues['article_create'] = $article->querySelector('.dt')->nodeValue;
             $articleValues['link'] = $article->querySelector('a')->getAttribute('href');
             $articleValues['image'] = $article->querySelector('img')->getAttribute('src');
             $result[] = $articleValues;

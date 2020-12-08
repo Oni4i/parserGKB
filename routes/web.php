@@ -21,8 +21,29 @@ Route::get('/', function () {
 });
 
 Route::get('/parse', function () {
+
+    $months_ru = [
+        'января' ,
+        'февраля' ,
+        'марта' ,
+        'апреля' ,
+        'мая' ,
+        'июня' ,
+        'июля' ,
+        'августа' ,
+        'сентября'  ,
+        'октября' ,
+        'ноября',
+        'декабря'
+    ];
+
     $gkb = new GKB();
     $count = 0;
+
+    if (!file_exists(Storage::path('img'))) {
+            mkdir(Storage::path('img'));
+    }
+
     foreach ($gkb->getAllArticles() as $article) {
         try {
             $image = file_get_contents($article['image']);
@@ -31,6 +52,16 @@ Route::get('/parse', function () {
 
             fwrite($savefile, $image);
             fclose($savefile);
+
+            $time = explode(',', $article['article_create']);
+            list($day, $months) = explode(' ', $time[0]);
+            $time = trim($time[1] . '-' . array_search($months, $months_ru) . '-' . $day);
+            $article['article_create'] = strtotime($time);
+
+            unset($article['image']);
+            $article = new \App\Models\Article($article);
+            $article->save();
+
         } catch (Exception $e) {
             return response()->json(['success' => 0, 'error' => $e->getMessage()]);
         }
